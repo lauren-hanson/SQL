@@ -95,14 +95,4 @@ inner join sales s
 inner join salestypes st	
 	on s.sales_type_id = st.sales_type_id 
 	
-	-- total income(purchase & lease) per employee
-select 
-	distinct d.business_name as dealership,
-	SUM(s.price) OVER(partition by d.business_name) LeaseTotal
-from dealerships d 
-inner join sales s 
-	on d.dealership_id = s.dealership_id 
-inner join salestypes st	
-	on s.sales_type_id = st.sales_type_id Ï
-	
-	
+
