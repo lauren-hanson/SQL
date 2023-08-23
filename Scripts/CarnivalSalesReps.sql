@@ -47,7 +47,8 @@ join sales s
 	on e.employee_id = s.employee_id 
 left join salestypes st	
 	on s.sales_type_id = st.sales_type_id
-where st.sales_type_name = 'Lease' and e.employee_id = 1
-
+where st.sales_type_name = 'Lease' 
+order by TotalLeaseSales desc
+limit 2
 
 
