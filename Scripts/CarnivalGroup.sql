@@ -79,20 +79,20 @@ where v.is_sold = false
 -- count of each model in stock 
 select 
 	distinct model, 
-	COUNT(model) over (partition by model)
+	COUNT(model) over (partition by model) as ModelCount
 from vehiclesinstock 
 
 
 -- count of each make in stock 
 select 
 	distinct make, 
-	COUNT(make) over (partition by make)
+	COUNT(make) over (partition by make) as MakeCount
 from vehiclesinstock 
 
 -- count of each body type in stock 
 select 
 	distinct body_type, 
-	COUNT(body_type) over (partition by body_type)
+	COUNT(body_type) over (partition by body_type) as BodyTypeCount
 from vehiclesinstock 
 
 -- PURCHASING POWER -- 
