@@ -71,7 +71,6 @@ where st.sales_type_name = 'Lease'
 	and extract(month from s.purchase_date) = 1
 
 
-
 -- lease income per dealership for all of 2019 
 select 
 	distinct d.business_name as dealership,
