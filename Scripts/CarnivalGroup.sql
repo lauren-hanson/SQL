@@ -1,4 +1,5 @@
 -- BEST SELLERS -- 
+
 -- top 5 employees for generating sales income 
 select 
 	distinct e.last_name, 
@@ -34,26 +35,12 @@ order by TotalSalesPerModel desc
 limit 1
 
 
--- working on top performance 
-select 
-	e.first_name || ' ' || e.last_name, 
-	d.business_name, 
-	s.sale_id 
-from employees e 
-join dealershipemployees de 
-	on e.employee_id = de.employee_id 
-join dealerships d 
-	on de.dealership_id = de.dealership_id 
-join sales s 
-	on d.dealership_id = s.dealership_id 
 
 -- TOP PERFORMANCE -- 
 -- employees who generated most income per dealership
 select 
 	distinct(e.first_name || ' ' || e.last_name) as EmployeeName, 
-	s.price,
---	over (partition by e.employee_id) as TotalSalesPerEmployee, 
-	d.business_name 
+	SUM(s.price) over (partition by e.employee_id) as TotalSalesPerEmployee
 from employees e 
 join dealershipemployees de 
 	on e.employee_id = de.employee_id 
@@ -61,8 +48,9 @@ join dealerships d
 	on de.dealership_id = d.dealership_id 
 join sales s 
 	on d.dealership_id = s.dealership_id 
-order by EmployeeName
---where e.employee_id = 1
+order by TotalSalesPerEmployee desc 
+limit 1
+
 
 -- VEHICLE REPORTS -- 
 create view VehiclesInStock as 
@@ -98,5 +86,27 @@ from vehiclesinstock
 -- PURCHASING POWER -- 
 -- US state's customers that have highest average purchase price for vehicle 
 
+select 
+	c.state, 
+	AVG(s.price) over(partition by s.sale_id) as AverageSalesPerState
+from sales s 
+join customers c 
+	on s.customer_id = c.customer_id 
+order by averagesalesperstate desc 
+limit 1
+
 -- 5 states that have the highest average purchase price for a vehicle per customer 
+select 
+	distinct c.first_name || ' ' || c.last_name CustomerName, 
+	c.state,
+	AVG(s.price) over (partition by c.customer_id) AveragePricePerCustomer
+from sales s 
+join customers c 
+	on s.customer_id = c.customer_id 
+join vehicles v 
+	on s.vehicle_id = v.vehicle_id 
+left join vehicletypes vt 
+	on v.vehicle_type_id = vt.vehicle_type_id 
+order by AveragePricePerCustomer desc 
+limit 5
 
