@@ -74,3 +74,25 @@ join dealerships d
 group by d.business_name, e.employee_id, e.first_name, e.last_name, s.price
 order by rank desc 
 
+SELECT
+	dealership_id,
+	business_name,
+	employee_id,
+	CONCAT(first_name, ' ', last_name) AS employee_name,
+	number_of_sales
+FROM (
+	SELECT
+		d.dealership_id,
+		e.employee_id, 
+		d.business_name,
+		e.first_name,
+		e.last_name,
+		COUNT(s.sale_id) as number_of_sales,
+		RANK() OVER (PARTITION BY d.dealership_id ORDER BY COUNT(s.sale_id) DESC) AS sales_rank
+	FROM sales s
+	JOIN employees e ON s.employee_id = e.employee_id
+	JOIN dealerships d ON s.dealership_id = d.dealership_id
+	GROUP BY d.dealership_id, d.business_name, e.employee_id, e.first_name, e.last_name
+) ranked_sales
+WHERE sales_rank = 1
+
