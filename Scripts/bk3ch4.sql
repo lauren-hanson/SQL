@@ -42,7 +42,7 @@ end
 $$; 
 
 
-call vehicle_return(1); 
+call vehicle_return(3); 
 
 -- check to make sure SP is adding information correctly
 select 
@@ -55,7 +55,7 @@ join sales s
 on v.vehicle_id = s.vehicle_id
 join oilchangelogs o 
 on v.vehicle_id = o.vehicle_id 
-where v.vehicle_id = 1
+where v.vehicle_id = 3
 
 
 
