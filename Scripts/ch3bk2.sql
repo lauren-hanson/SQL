@@ -18,12 +18,18 @@ How would you recommend fixing it?
 */
 
 select * from employees 
+where employee_id = 35; 
+
 select * from employeetypes
 select * from dealershipemployees  
 
-alter table dealershipemployees
+
+alter table dealershipemployees 
 drop constraint employee_id,
 add constraint employee_id
 	foreign key (employee_id) 
 	references employees (employee_id) 
-	on delete cascade
+	on delete no action
+	
+delete from employees e
+where e.employee_id = 35; 
