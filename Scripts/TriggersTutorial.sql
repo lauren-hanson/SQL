@@ -35,7 +35,7 @@ begin
 	-- trigger logic 
 end; 
 $$ 
-end
+
 
 -- postgreSQL create trigger statement
 create trigger trigger_name 
