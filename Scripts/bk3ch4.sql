@@ -1,6 +1,5 @@
 select * from sales 
 
-
  -- updating vehicle inventory when a sale occurs -- 
 create procedure vehicle_sale(p_vehicle_id int)
 language plpgsql
@@ -42,7 +41,7 @@ end
 $$; 
 
 
-call vehicle_return(3); 
+call vehicle_return(5); 
 
 -- check to make sure SP is adding information correctly
 select 
@@ -55,7 +54,7 @@ join sales s
 on v.vehicle_id = s.vehicle_id
 join oilchangelogs o 
 on v.vehicle_id = o.vehicle_id 
-where v.vehicle_id = 3
+where v.vehicle_id = 5
 
 
 
