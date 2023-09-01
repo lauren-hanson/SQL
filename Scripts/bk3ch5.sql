@@ -43,11 +43,7 @@ begin
 		update sales 
 		set pickup_date = purchase_date + integer '7';
 	
---		if new.pickup_date > new.purchase_date and new.pickup_date >= new.purchase_date or integer '7' then 
-		if new.pickup_date >= new.purchase_date and new.pickup_date < new.purchase_date + integrity '7' then
-			update sales 
-			set pickup_date = pickup_date + integer '4'; 
-		end if; 
+
 	
 	end if; 
 	
