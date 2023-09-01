@@ -59,16 +59,16 @@ create or replace trigger NewSale
 
 
 insert into sales (sales_type_id, vehicle_id, employee_id, customer_id, dealership_id, price, deposit, purchase_date, pickup_date, invoice_number, payment_method, sale_returned)
-values (2, 1001, 400, 22, 16, 6000, 200, '2020-12-01', null, '8032789882', 'MC', false);
+values (2, 1001, 400, 22, 16, 6000, 200, '2020-12-01', '2020-12-01', '8032789882', 'MC', false);
 
 
 update sales 
-set pickup_date = '2020-12-08'
-where sale_id = 5050;
+set pickup_date = '2020-12-04'
+where sale_id = 5051;
 
 
 select purchase_date, pickup_date from sales 
-where sale_id = 5050; 
+where sale_id = 5051; 
 
 
 

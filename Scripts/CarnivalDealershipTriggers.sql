@@ -54,16 +54,34 @@ create or replace trigger set_default_number
 	execute procedure default_number(); 
 
 insert into dealerships (business_name, phone, city, state, website, tax_id)
-values('Bandon Autos or Oregon', null, 'Bandon', 'Oregon', 'http://www.bandonautos.com', 'nm-167-gf-e54i')
+values('Thomas Autos or North Carolina', null, 'Bryson City', 'North Carolina', 'http://www.brysoncityautos.com', 'er-932-th-e87w')
+
 
 
 /* if tax is provided, then it should be recorded into database as bv-832-2h-se8w--virginia */
 create or replace function tax_records()
-	return trigger 
+	returns trigger 
+	language plpgsql 
 	as 
 	$$
 	begin 
-		-- logic 
+		new.tax_id := new.tax_id||'--'||new.state;
+		return new;
 	end;
 	$$
 	
+	create or replace trigger set_tax_id
+	before insert
+	on dealerships 
+	for each row
+	execute procedure tax_records(); 
+
+
+
+insert into dealerships (business_name, phone, city, state, website, tax_id)
+values('Tomita Autos of Florida', null, 'Tampa', 'Florida', 'http://www.tampaautos.com', 'kl-578-bf-d49a')
+
+update dealerships 
+set tax_id = replace(tax_id, '--'||city, '--'|| state) 
+
+--WHERE tax_id = tax_id||'--'||city
