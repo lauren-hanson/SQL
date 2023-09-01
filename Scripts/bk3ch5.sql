@@ -39,20 +39,13 @@ returns trigger
 as 
 $$
 begin
-	
---	if new.pickup_date <= new.purchase_date then 
---		update sales 
---		set pickup_date = purchase_date + interval '7 days';
---		
---	end if; 
-	
-	IF new.pickup_date <= old.purchase_date then
+	if new.pickup_date <= old.purchase_date then
 		new.pickup_date := old.purchase_date + interval '7 days';
---        UPDATE sales
---        SET pickup_date = purchase_date + INTERVAL '7 days'
---        WHERE sales.sale_id = sale_id;
-    END IF;
 	
+	ELSEIF new.pickup_date > new.purchase_date 
+        AND new.pickup_date < new.purchase_date + interval '7 days' THEN
+        new.pickup_date := old.pickup_date + interval '4 days';
+    END IF;
 	return new; 
 end;
 $$
@@ -64,18 +57,18 @@ create or replace trigger NewSale
 	for each row 
 	execute procedure UpdatePickupDate(); 
 
+
 insert into sales (sales_type_id, vehicle_id, employee_id, customer_id, dealership_id, price, deposit, purchase_date, pickup_date, invoice_number, payment_method, sale_returned)
 values (2, 1001, 400, 22, 16, 6000, 200, '2020-12-01', null, '8032789882', 'MC', false);
 
+
 update sales 
-set pickup_date = '2020-12-02'
---set purchase_date = '2021-12-04'
+set pickup_date = '2020-12-08'
 where sale_id = 5050;
+
 
 select purchase_date, pickup_date from sales 
 where sale_id = 5050; 
 
---delete from sales 
---where sale_id in ()
 
 
