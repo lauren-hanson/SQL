@@ -32,7 +32,8 @@ create function trigger_function ()
 	language plpgsql
 as $$
 begin 
-	-- trigger logic 
+	-- trigger logic
+	return 
 end; 
 $$ 
 
