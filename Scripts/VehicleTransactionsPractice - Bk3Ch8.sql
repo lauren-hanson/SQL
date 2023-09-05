@@ -68,22 +68,43 @@ select
 from vehicles v
 join vehicletypes vt 
 on v.vehicle_id = vt.vehicle_type_id 
-where vt.model in ('CX-5', 'CX-9') and v.is_sold = false
+--where vt.model in ('CX-5', 'CX-9') and v.is_sold = false
 -- vt.make = 'Mazda' and
-
-
+where vt.model in (
+	select vt.model 
+	from vehicletypes vt
+	where vt.make = 'Mazda'
+	
+--	and vt.model in ('CX-5', 'CX-9')
+) 
+--and vt.model not  in ('CX-5', 'CX-9')
+and v.is_sold = false
 
 begin; 
 
-update vehicles 
-set year_of_car = 2021
-where model in (
-	select * 
-	from vehicletypes 
-	where make = 'Mazda' and model in ('CX-5', 'CX-9')
-) and is_sold = false
+update vehicles v
+set v.year_of_car = 2021
+from vehicletypes vt
+	where vt.make = 'Mazda'
+	and vt.model in ('CX-5', 'CX-9')
+	and v.is_sold = false; 
 
-commit; 
+update vehicles v
+set v.year_of_car = 2020
+from vehicletypes vt
+	where vt.make = 'Mazda'
+	and v.is_sold = false; 
+
+update vehicles v
+set v.interior_color = 'Red & Black'
+from vehicletypes vt
+	where vt.make = 'Mazda'
+	and v.year_of_car >= 2021
+	and v.is_sold = false
+
+exception when others then
+  -- RAISE INFO 'name:%', SQLERRM;
+  rollback;
 
 
 /*
