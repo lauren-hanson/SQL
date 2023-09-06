@@ -11,6 +11,7 @@ select
 	e.employee_id,
 	e.first_name, 
 	e.last_name, 
+	et.employee_type_id,
 	et.employee_type_name 
 from employees e
 left join employeetypes et
@@ -28,61 +29,7 @@ Write a transaction to:
 3. each new mechanic will be working at all three of these dealerships: Meeler Autos of San Diego, Meadley Autos of California & Major Autos of Florida
 */
 
-do $$ 
-declare 
-  NewEmployeeType integer;
-  NewEmployeeId integer;
-  DealershipIds integer[] = array[36, 20, 50]; 
-  dealer_id integer;
 
-begin
-
--- add new role 
-insert into employeetypes(employee_type_name)
-values('Automotive Mechanic') 
-returning employee_type_id into NewEmployeeType; 
-
-
--- 5 new mechanics
-insert into 
-	employees (
-		first_name, 
-		last_name, 
-		email_address, 
-		phone, 
-		employee_type_id)
-	values
-		('George', 'Hanson', 'george@george.com', '516-934-4829', NewEmployeeType), 
-		('Nigel', 'Hussung', 'nigel@nigel.com', '412-398-6283', NewEmployeeType),
-		('Anastasia', 'Thomas', 'anastasia@anastasia.com', '689-321-4938', NewEmployeeType), 
-		('Gio', 'Roggenbuck', 'gio@gio.com', '513-284-5693', NewEmployeeType), 
-		('Poppy', 'Nelson', 'poppy@poppy.com', '378-276-3948', NewEmployeeType)
-		returning employee_id into NewEmployeeId;
-	
-foreach dealer_id in array DealershipIds
-loop 	
-	insert into 
-	dealershipemployees (
-		dealership_id, 
-		employee_id 
-	)
-	values(dealer_id, NewEmployeeId); 
-end loop; 
-
---insert into 
---	dealershipemployees (
---		dealership_id, 
---		employee_id 
---	)
---values (36, NewEmployeeId), (20, NewEmployeeId), (50, NewEmployeeId); 
-
-exception when others then 
-  -- RAISE INFO 'name:%', SQLERRM;
-  rollback;
-
-end;
-
-$$ language plpgsql;
 
 
 
@@ -101,14 +48,18 @@ select * from dealerships
 where business_name in ('Nelsen Autos of Illinois', 'Cain Autos of Missouri')
 -- Nelsen(17) => Cain(3)
 
-select * from employees 
+select * from employees
+order by employee_id desc
+
 select * from employeetypes  
 select * from dealershipemployees 
+
 
 do $$ 
 declare 
   NewDealershipId integer;
-  NewEmployeeIds integer[]; 
+ -- declare an array to store employee_ids
+--  NewEmployeeIds integer[]; 
 
 begin
 	
@@ -142,21 +93,18 @@ begin
 	values 
 		('Jennifer', 'Taylor', 'jennifer@jennifer.com', '7345-938-2739', 3), 
 		('Mark', 'Browne', 'jennifer@jennifer.com', '7345-938-2739', 6), 
-		('Tyler', '', 'jennifer@jennifer.com', '7345-938-2739', 4)
-		returning employee_id into NewEmployeeIds; 
-	
-	update dealershipemployees 
-	set dealership_id = NewDealershipId
-	where employee_id = NewEmployeeIds;
+		('Tyler', 'Martin', 'jennifer@jennifer.com', '7345-938-2739', 4);
 	
 	-- all employees currently working at Nelsen Autos will nto work at Cain instead 
 	update dealershipemployees 
 	set dealership_id = 3
 	where dealership_id = 17;
+
+	commit; 
 	
 	
 exception when others then 
-  -- RAISE INFO 'name:%', SQLERRM;
+  RAISE INFO 'Error:%', SQLERRM;
   rollback;
 
 end;
