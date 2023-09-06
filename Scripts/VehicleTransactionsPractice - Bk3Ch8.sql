@@ -62,19 +62,21 @@ select
 	v.vehicle_id,
 	v.exterior_color,
 	v.interior_color,
+	v.year_of_car,
 	v.is_sold,
 	vt.make,
 	vt.model
 from vehicles v
 join vehicletypes vt 
 on v.vehicle_id = vt.vehicle_type_id 
---where vt.model in ('CX-5', 'CX-9') and v.is_sold = false
+where vt.model in ('CX-5', 'CX-9') 
+and v.is_sold = false
 -- vt.make = 'Mazda' and
 where vt.model in (
 	select vt.model 
 	from vehicletypes vt
 	where vt.make = 'Mazda'
---	and vt.model in ('CX-5', 'CX-9')
+	and vt.model in ('CX-5', 'CX-9')
 ) 
 --and vt.model not  in ('CX-5', 'CX-9')
 and v.is_sold = false
@@ -89,7 +91,7 @@ from vehicletypes vt
 	and vt.model in ('CX-5', 'CX-9')
 	and is_sold = false; 
 
-savepoint foo;
+ SAVEPOINT foo;
 
 update vehicles 
 set year_of_car = 2020
@@ -97,21 +99,22 @@ from vehicletypes vt
 	where vt.make = 'Mazda'
 	and is_sold = false; 
 
-savepoint foo;
+ SAVEPOINT foo;
 
 update vehicles 
 set interior_color = 'Red & Black'
 from vehicletypes vt
 	where vt.make = 'Mazda'
 	and year_of_car >= 2021
-	and is_sold = false
+	and is_sold = false;
 	
-	
-EXCEPTION
-  WHEN OTHERS THEN
-    -- Handle the error as needed, and rollback the transaction
-    RAISE INFO 'Error: %', SQLERRM;
-    ROLLBACK;
+--commit; 
+--EXCEPTION
+--  WHEN OTHERS THEN
+--    -- Handle the error as needed, and rollback the transaction
+--    RAISE INFO 'Error: %', SQLERRM;
+ROLLBACK TO SAVEPOINT foo;
+
 END;
 $$ LANGUAGE plpgsql;
 

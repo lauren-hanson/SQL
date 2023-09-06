@@ -30,7 +30,65 @@ Write a transaction to:
 */
 
 
+do $$ 
+declare 
+  NewEmployeeTypeId integer;
+  NewEmployeeId integer;
+  DealershipIds integer[] = array[36, 20, 50]; 
+  dealer_id integer;
 
+begin
+
+-- add new role 
+insert into employeetypes(employee_type_name)
+values('Automotive Mechanic') 
+returning employee_type_id into NewEmployeeTypeId; 
+
+
+
+-- 5 new mechanics
+insert into 
+	employees (
+		first_name, 
+		last_name, 
+		email_address, 
+		phone, 
+		employee_type_id)
+	values
+		('George', 'Hanson', 'george@george.com', '516-934-4829', NewEmployeeTypeId), 
+		('Nigel', 'Hussung', 'nigel@nigel.com', '412-398-6283', NewEmployeeTypeId),
+		('Anastasia', 'Thomas', 'anastasia@anastasia.com', '689-321-4938', NewEmployeeTypeId), 
+		('Gio', 'Roggenbuck', 'gio@gio.com', '513-284-5693', NewEmployeeTypeId), 
+		('Poppy', 'Nelson', 'poppy@poppy.com', '378-276-3948', NewEmployeeTypeId)
+		returning employee_id into NewEmployeeId;
+	
+
+foreach dealer_id in array DealershipIds
+loop 	
+	insert into 
+	dealershipemployees (
+		dealership_id, 
+		employee_id 
+	)
+	values(dealer_id, NewEmployeeId); 
+end loop;
+
+--insert into 
+--	dealershipemployees (
+--		dealership_id, 
+--		employee_id 
+--	)
+--values (36, NewEmployeeId), (20, NewEmployeeId), (50, NewEmployeeId); 
+
+commit; 
+
+exception when others then 
+  RAISE INFO 'Error:%', SQLERRM;
+  rollback;
+
+end;
+
+$$ language plpgsql;
 
 
 
@@ -54,12 +112,13 @@ order by employee_id desc
 select * from employeetypes  
 select * from dealershipemployees 
 
+-----------------------------------------------------------------------------------
 
 do $$ 
 declare 
   NewDealershipId integer;
  -- declare an array to store employee_ids
---  NewEmployeeIds integer[]; 
+  NewEmployeeIds integer[]; 
 
 begin
 	
@@ -91,9 +150,10 @@ begin
 		employee_type_id 
 	)
 	values 
-		('Jennifer', 'Taylor', 'jennifer@jennifer.com', '7345-938-2739', 3), 
-		('Mark', 'Browne', 'jennifer@jennifer.com', '7345-938-2739', 6), 
-		('Tyler', 'Martin', 'jennifer@jennifer.com', '7345-938-2739', 4);
+		('Jennifer', 'Taylor', 'jennifer@jennifer.com', '345-938-2739', 3), 
+		('Mark', 'Browne', ' mark@mark.com', '815-483-9283', 6), 
+		('Tyler', 'Martin', 'tyler@tyler.com', '214-837-5693', 4)
+		returning employee_id into NewEmployeeIds; 
 	
 	-- all employees currently working at Nelsen Autos will nto work at Cain instead 
 	update dealershipemployees 
