@@ -45,6 +45,10 @@ declare
 -- variables go here
 CatId integer; 
 DogId integer; 
+NumCats integer; 
+NumDogs integer; 
+NumAnimals integer; 
+gotError integer; 
 
 begin
 	-- create new tables 
@@ -67,16 +71,24 @@ begin
 	-- Need to Insert the animalTypes first
 	insert into AnimalTypes (animalTypeName) 
 	values ('Cat') 
+	-- this ensures that the correct ID is being created for each new row.
 	returning animalTypeId into CatId;
 
 	insert into AnimalTypes (animalTypeName) 
-	values ('Dog') returning animalTypeId 
-	into DogId;
+	values ('Dog') 
+	returning animalTypeId into DogId;
 
 
 	-- Now we need to copy the data from the Cats table to the Animals Table
-	INSERT INTO Animals (animalName, color, ownerId, animalTypeId)
+	insert into Animals (animalName, color, ownerId, animalTypeId)
 	
+	/*
+	 
+	this would not work because it will not know where CatId is coming from. 
+	out of scope & needs to be defined
+	select c.catname, c.color, c.ownerId, CatId from cats c
+	
+	*/ 
 	-- vars = variables 
 	-- declaring vars as catid & give it a value of CatId(declared variable)
 	-- this allows for multiples to be added 
@@ -91,10 +103,18 @@ begin
  	left join cats c 
  	on 1=1;
 
- 	INSERT INTO 
- 		Animals (animalName, color, ownerId, animalTypeId)
+ 	
+ 	-- check if data migrated
+ 	select count(*) from cats into NumCats; 
+ 	select count(*) from animals into NumAnimals; 
+ 
+ 	if NumCats <> NumAnimals then 
+ 		rollback; 
+ 	end if; 
  	
 	-- How do I do this with using some from a query and then a variable?
+ 	insert into
+ 		Animals (animalName, color, ownerId, animalTypeId)
     with vars (dogid) as (values (DogId))
     
  	select 
@@ -106,14 +126,26 @@ begin
  	left join dogs d 
  	on 1=1;
  
-	-- check if data migrated
+ 	select count(*) from dogs into NumDogs; 
+ 	select count(*) from animals into NumAnimals; 
+ 
+ 	if NumCats + NumDogs <> NumAnimals then 
+-- 	if 0 <> NumAnimals then 
+ 		rollback; 
+ 	end if; 
+ 
+
+	 
 	-- drop cats & dogs table
+ 	drop table cats; 
+ 	drop table dogs; 
 
 	
-exception when others then 
-rollback; 
-
-commit; 
+	exception when others then 
+		raise into 'name:%', sqlerrm; 
+	rollback; 
+	
+	commit; 
 end $$; 
 	
-end
+

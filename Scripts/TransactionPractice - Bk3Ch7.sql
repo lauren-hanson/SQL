@@ -6,6 +6,7 @@ select * from dealershipemployees
 where dealership_employee_id in (36, 20, 50)
 
 select * from employeetypes  
+where employee_type_name = 'Automotive Mechanic'
 
 select 
 	e.employee_id,
@@ -40,8 +41,8 @@ declare
 begin
 
 -- add new role 
-insert into employeetypes(employee_type_name)
-values('Automotive Mechanic') 
+insert into employeetypes (employee_type_name)
+values ('Automotive Mechanic') 
 returning employee_type_id into NewEmployeeTypeId; 
 
 
@@ -54,13 +55,14 @@ insert into
 		email_address, 
 		phone, 
 		employee_type_id)
+		
 	values
 		('George', 'Hanson', 'george@george.com', '516-934-4829', NewEmployeeTypeId), 
 		('Nigel', 'Hussung', 'nigel@nigel.com', '412-398-6283', NewEmployeeTypeId),
 		('Anastasia', 'Thomas', 'anastasia@anastasia.com', '689-321-4938', NewEmployeeTypeId), 
 		('Gio', 'Roggenbuck', 'gio@gio.com', '513-284-5693', NewEmployeeTypeId), 
 		('Poppy', 'Nelson', 'poppy@poppy.com', '378-276-3948', NewEmployeeTypeId)
-		returning employee_id into NewEmployeeId;
+		returning employee_id;
 	
 
 foreach dealer_id in array DealershipIds
@@ -79,8 +81,6 @@ end loop;
 --		employee_id 
 --	)
 --values (36, NewEmployeeId), (20, NewEmployeeId), (50, NewEmployeeId); 
-
-commit; 
 
 exception when others then 
   RAISE INFO 'Error:%', SQLERRM;
