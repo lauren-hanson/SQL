@@ -13,20 +13,22 @@ order by vehicle_id desc
 select * from vehicles
 order by vehicle_id desc
 
+-- new table for accounting team 
+create table AccountsReceivable (
+	accounts_receivable_id int primary key generated always as identity,
+	credit_amount numeric(8, 2), 
+	debit_amount numeric(8, 2), 
+	date_received date, 
+	sale_id integer not null, 
+	foreign key (sale_id) references sales(sale_id) 
+); 
+
+select * from accountsreceivable 
+
 -- declare variable that will store the new sale id so we can pass that to accounting table 
 do $$ 
 declare 
 	NewSaleId
-
--- new table for accounting team 
-create or replace table AccountsReceivable(
-	accounts_receivable_id serial primary key,
-	credit_amount int, 
-	debit_amount int, 
-	date_received date, 
-	sale_id int, 
-	foreign key (sale_id) references Sales(sale_id)
-)
 
 -- create a new purchase 
 insert into sales (sales_type_id, vehicle_id, employee_id, customer_id, dealership_id, price, deposit, purchase_date, pickup_date, invoice_number, payment_method, sale_returned)
