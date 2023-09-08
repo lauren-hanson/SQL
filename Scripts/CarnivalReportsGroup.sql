@@ -20,10 +20,11 @@ create table AccountsReceivable (
 	debit_amount numeric(8, 2), 
 	date_received date, 
 	sale_id integer not null, 
-	foreign key (sale_id) references sales(sale_id) 
+	foreign key (sale_id) references sales(sale_id) on delete cascade
 ); 
 
 drop table accountsreceivable 
+
 select * from AccountsReceivable 
 
 
@@ -35,8 +36,8 @@ as $$
 begin
   -- trigger function logic
   insert into AccountsReceivable(credit_amount, date_received, sale_id)
-  values(new.deposit, new.purchase_date, new.sale_id);
-  return null;
+  values(new.deposit, current_date, new.sale_id);
+  return new;
 end;
 $$
 
@@ -47,12 +48,15 @@ create or replace trigger new_sale
   execute procedure NewAccountsRecord();
  
 insert into sales(sales_type_id,vehicle_id,employee_id,customer_id,dealership_id,price,deposit,purchase_date,pickup_date,invoice_number,payment_method)
-	values(1,1,1,1,1,24333.67,6500,current_date,current_date,1273592747, 'MC');
+	values(3,4,3,3,3,24333.67,6500,current_date,current_date,1273592747, 'MC');
 		
 
 select * from AccountsReceivable a
 
 select * from sales
+where deposit = 6500
+
+delete from sales 
 where price = 24333.67
 
 
