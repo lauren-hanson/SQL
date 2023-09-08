@@ -16,43 +16,44 @@ order by vehicle_id desc
 -- new table for accounting team 
 create table AccountsReceivable (
 	accounts_receivable_id int primary key generated always as identity,
-	credit_amount numeric(8, 2), 
+	credit_amount integer, 
 	debit_amount numeric(8, 2), 
 	date_received date, 
 	sale_id integer not null, 
 	foreign key (sale_id) references sales(sale_id) 
 ); 
 
-
+drop table accountsreceivable 
 select * from AccountsReceivable 
 
 
 -- set up trigger when new row is added, insert row to AR (deposit = credit_amount, timestamp = date_received, sale_id)
-create or replace function NewAccountsReceivableRecord()
+create or replace function NewAccountsRecord()
   returns trigger
   language plpgsql 
 as $$
 begin
   -- trigger function logic
-  insert into AccountsReceivable (credit_amount, date_received, sale_id)
-  values (new.deposit, new.purchase_date, new.sale_id);
+  insert into AccountsReceivable(credit_amount, date_received, sale_id)
+  values(new.deposit, new.purchase_date, new.sale_id);
   return null;
 end;
 $$
 
-create or replace trigger NewSaleMade
+create or replace trigger new_sale
   after insert
   on sales
   for each row
-  execute procedure NewAccountsReceivableRecord();
+  execute procedure NewAccountsRecord();
  
-insert into
-sales(sales_type_id, vehicle_id, employee_id, customer_id, dealership_id, price, deposit, purchase_date, pickup_date, invoice_number, payment_method, sale_returned)
-values(1, 12, 4, 4, 4, 25000, 5000, current_date, current_date, 874569345, 'Mastercard', false);
-
+insert into sales(sales_type_id,vehicle_id,employee_id,customer_id,dealership_id,price,deposit,purchase_date,pickup_date,invoice_number,payment_method)
+	values(1,1,1,1,1,24333.67,6500,current_date,current_date,1273592747, 'MC');
+		
 
 select * from AccountsReceivable a
+
 select * from sales
+where price = 24333.67
 
 
 --------------------------------------------------------------------------------------------------------------------------
