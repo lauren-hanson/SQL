@@ -52,3 +52,26 @@ Create a SP with a transaction to handle an employee leaving.
 Remove employee record.
 Remove all records associated with the employee w/ dealerships must also be removed
 */
+
+create or replace procedure EmployeeLeaving()
+language plpgsql 
+as $$
+declare 
+
+begin 
+	
+	delete from dealershipemployees 
+	where employee_id = 1085;
+
+	commit; 
+
+	delete from employees 
+	where employee_id = 1085;
+	
+	
+
+end; 
+$$;
+
+call EmployeeLeaving(); 
+
