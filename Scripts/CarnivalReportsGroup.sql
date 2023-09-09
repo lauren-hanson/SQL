@@ -20,7 +20,7 @@ create table AccountsReceivable (
 	debit_amount numeric(8, 2), 
 	date_received date, 
 	sale_id integer not null, 
-	foreign key (sale_id) references sales(sale_id) on delete cascade
+	foreign key (sale_id) references sales(sale_id) 
 ); 
 
 drop table accountsreceivable 
@@ -37,7 +37,7 @@ begin
   -- trigger function logic
   insert into AccountsReceivable(credit_amount, date_received, sale_id)
   values(new.deposit, current_date, new.sale_id);
-  return new;
+  return null;
 end;
 $$
 
@@ -48,7 +48,7 @@ create or replace trigger new_sale
   execute procedure NewAccountsRecord();
  
 insert into sales(sales_type_id,vehicle_id,employee_id,customer_id,dealership_id,price,deposit,purchase_date,pickup_date,invoice_number,payment_method)
-	values(3,4,3,3,3,24333.67,6500,current_date,current_date,1273592747, 'MC');
+	values(1,4,3,2,1,60234.56,9000,current_date,current_date,5672349847, 'visa');
 		
 
 select * from AccountsReceivable a
@@ -66,7 +66,7 @@ where price = 24333.67
 --Set up a trigger on the Sales table for when the sale_returned flag is updated. Add a new row to the Accounts Receivable table with the deposit as debit_amount, the timestamp as date_received, etc.
 create or replace function returned_lemon_accountsReceivable()
   returns trigger
-  language PlPGSQL
+  language plpgsql 
 as $$
 begin
   -- trigger function logic
@@ -93,6 +93,8 @@ select * from sales s
 where sale_id = 1
 
 select * from AccountsReceivable a
+where sale_id = 2
+
 
 
 --------------------------------------------------------------------------------------------------------------------------
