@@ -15,6 +15,34 @@ select * from dealershipemployees
 	order by dealership_employee_id desc
 	
 
+--create or replace procedure NewHireInformation()
+--language plpgsql  
+--as $$
+--declare 
+--	NewCustomerId integer; 
+--	CurrentTS date; 
+--
+--begin
+--	insert into employees(first_name,last_name,email_address,phone,employee_type_id)
+--	values('George','Hanson','george@george.com','6157245692', 7)
+--	returning employee_id into NewCustomerId; 
+--	
+--	commit; 
+--
+--	CurrentTS = current_date; 
+--
+--	insert into dealershipemployees(dealership_id,employee_id)
+--	values(75, NewCustomerId); 
+--	
+--	commit; 
+--
+--	insert into dealershipemployees(dealership_id,employee_id)
+--	values(51, NewCustomerId); 
+--	
+--	
+--end; 
+--$$; 
+
 create or replace procedure NewHireInformation()
 language plpgsql  
 as $$
@@ -24,7 +52,7 @@ declare
 
 begin
 	insert into employees(first_name,last_name,email_address,phone,employee_type_id)
-	values('George','Hanson','george@george.com','6157245692', 7)
+	values(new.first_name, new.last_name, new.email_address, new.phone, new.employee_type_id)
 	returning employee_id into NewCustomerId; 
 	
 	commit; 
