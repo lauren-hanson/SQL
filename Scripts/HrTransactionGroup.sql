@@ -12,66 +12,39 @@ select * from dealerships
 	order by dealership_id desc
 	
 select * from dealershipemployees 
+where employee_id = 1086
 	order by dealership_employee_id desc
 	
 
---create or replace procedure NewHireInformation()
---language plpgsql  
---as $$
---declare 
---	NewCustomerId integer; 
---	CurrentTS date; 
---
---begin
---	insert into employees(first_name,last_name,email_address,phone,employee_type_id)
---	values('George','Hanson','george@george.com','6157245692', 7)
---	returning employee_id into NewCustomerId; 
---	
---	commit; 
---
---	CurrentTS = current_date; 
---
---	insert into dealershipemployees(dealership_id,employee_id)
---	values(75, NewCustomerId); 
---	
---	commit; 
---
---	insert into dealershipemployees(dealership_id,employee_id)
---	values(51, NewCustomerId); 
---	
---	
---end; 
---$$; 
-
-create or replace procedure NewHireInformation()
+create or replace procedure NewHireInformation(
+	p.first_name text, 
+	p.last_name text, 
+	p.email_address text, 
+	p.phone text, 
+	p.employee_type_id int, 
+	p.dealership_id1 int, 
+	p.dealership_id2 int)
 language plpgsql  
 as $$
 declare 
-	NewCustomerId integer; 
-	CurrentTS date; 
+	v.newemployeeid integer; 
 
 begin
 	insert into employees(first_name,last_name,email_address,phone,employee_type_id)
-	values(new.first_name, new.last_name, new.email_address, new.phone, new.employee_type_id)
-	returning employee_id into NewCustomerId; 
-	
-	commit; 
-
-	CurrentTS = current_date; 
+	values(p.first_name, p.last_name, p.email_address, p.phone,p.employee_type_id)
+	returning employee_id into v.newemployeeid; 
 
 	insert into dealershipemployees(dealership_id,employee_id)
-	values(75, NewCustomerId); 
+	values(p.dealership_id1, v.newemployeeid), (p.dealership_id2, v.newemployeeid); 
 	
-	commit; 
-
-	insert into dealershipemployees(dealership_id,employee_id)
-	values(51, NewCustomerId); 
-	
+	exception when others then 
+		rollback; 
+		raise;
 	
 end; 
 $$; 
 
-call NewHireInformation(); 
+call NewHireInformation('Nigel', 'Hussung', 'nigel@nigel.com', '582-894-1283', 5, 12, 18); 
 
 
 
@@ -81,7 +54,9 @@ Remove employee record.
 Remove all records associated with the employee w/ dealerships must also be removed
 */
 
-create or replace procedure EmployeeLeaving()
+create or replace procedure EmployeeLeaving(
+	p.employee_id integer 
+	)
 language plpgsql 
 as $$
 declare 

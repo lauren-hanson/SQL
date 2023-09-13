@@ -3,24 +3,10 @@ where business_name in ('Meeler Autos of San Diego', 'Meadley Autos of Californi
 -- 36, 20, 50
 
 select * from dealershipemployees 
-where dealership_employee_id in (36, 20, 50)
+where dealership_id in (36, 20, 50) and employee_id = 1117
 
 select * from employeetypes  
 where employee_type_name = 'Automotive Mechanic'
-
-select 
-	e.employee_id,
-	e.first_name, 
-	e.last_name, 
-	et.employee_type_id,
-	et.employee_type_name 
-from employees e
-left join employeetypes et
-on e.employee_id = et.employee_type_id 
-order by e.employee_id desc
---left join dealershipemployees d 
---on e.employee_id = d.employee_id 
---where et.employee_type_name = 'Automotive Mechanic'
 
 
 /* 
@@ -34,9 +20,11 @@ Write a transaction to:
 do $$ 
 declare 
   NewEmployeeTypeId integer;
-  NewEmployeeId integer;
-  DealershipIds integer[] = array[36, 20, 50]; 
-  dealer_id integer;
+  NewEmployeeId1 integer; 
+  NewEmployeeId2 integer; 
+  NewEmployeeId3 integer; 
+  NewEmployeeId4 integer; 
+  NewEmployeeId5 integer; 
 
 begin
 
@@ -44,7 +32,6 @@ begin
 insert into employeetypes (employee_type_name)
 values ('Automotive Mechanic') 
 returning employee_type_id into NewEmployeeTypeId; 
-
 
 
 -- 5 new mechanics
@@ -56,37 +43,93 @@ insert into
 		phone, 
 		employee_type_id)
 		
-	values
-		('George', 'Hanson', 'george@george.com', '516-934-4829', NewEmployeeTypeId), 
-		('Nigel', 'Hussung', 'nigel@nigel.com', '412-398-6283', NewEmployeeTypeId),
-		('Anastasia', 'Thomas', 'anastasia@anastasia.com', '689-321-4938', NewEmployeeTypeId), 
-		('Gio', 'Roggenbuck', 'gio@gio.com', '513-284-5693', NewEmployeeTypeId), 
-		('Poppy', 'Nelson', 'poppy@poppy.com', '378-276-3948', NewEmployeeTypeId)
-		returning employee_id;
+values
+	('George', 'Hanson', 'george@george.com', '516-934-4829', NewEmployeeTypeId)
+			returning employee_id into NewEmployeeId1; 
+		
+insert into 
+	employees (
+		first_name, 
+		last_name, 
+		email_address, 
+		phone, 
+		employee_type_id)
+values
+	('Nigel', 'Hussung', 'nigel@nigel.com', '412-398-6283', NewEmployeeTypeId)
+			returning employee_id into NewEmployeeId2; 
+		
+insert into 
+	employees (
+		first_name, 
+		last_name, 
+		email_address, 
+		phone, 
+		employee_type_id)
+values
+	('Anastasia', 'Thomas', 'anastasia@anastasia.com', '689-321-4938', NewEmployeeTypeId)
+			returning employee_id into NewEmployeeId3; 
+		
+insert into 
+	employees (
+		first_name, 
+		last_name, 
+		email_address, 
+		phone, 
+		employee_type_id)
+values
+	('Gio', 'Roggenbuck', 'gio@gio.com', '513-284-5693', NewEmployeeTypeId)
+			returning employee_id into NewEmployeeId4; 
 	
+insert into 
+	employees (
+		first_name, 
+		last_name, 
+		email_address, 
+		phone, 
+		employee_type_id)
+	values
+	('Poppy', 'Nelson', 'poppy@poppy.com', '378-276-3948', NewEmployeeTypeId)
+		returning employee_id into NewEmployeeId5;
 
-foreach dealer_id in array DealershipIds
-loop 	
-	insert into 
+
+	
+-- connecting each employee to each dealership
+insert into 
 	dealershipemployees (
 		dealership_id, 
 		employee_id 
 	)
-	values(dealer_id, NewEmployeeId); 
-end loop;
 
---insert into 
---	dealershipemployees (
---		dealership_id, 
---		employee_id 
---	)
---values (36, NewEmployeeId), (20, NewEmployeeId), (50, NewEmployeeId); 
+	values
+		(36, NewEmployeeId1), 
+		(50, NewEmployeeId1), 
+		(20, NewEmployeeId1),
+		
+		(36, NewEmployeeId2), 
+		(50, NewEmployeeId2), 
+		(20, NewEmployeeId2),
+		
+		(36, NewEmployeeId3), 
+		(50, NewEmployeeId3), 
+		(20, NewEmployeeId3),
+		
+		(36, NewEmployeeId4), 
+		(50, NewEmployeeId4), 
+		(20, NewEmployeeId4),
+		
+		(36, NewEmployeeId5), 
+		(50, NewEmployeeId5), 
+		(20, NewEmployeeId5); 
+
+commit; 
 
 exception when others then 
   RAISE INFO 'Error:%', SQLERRM;
   rollback;
 
+
 end;
+
 
 $$ language plpgsql;
 
