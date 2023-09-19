@@ -8,6 +8,11 @@ where dealership_id in (36, 20, 50) and employee_id = 1117
 select * from employeetypes  
 where employee_type_name = 'Automotive Mechanic'
 
+select * from customers
+order by company_name
+select * from sales 
+select * from vehicles
+
 
 /* 
 Write a transaction to: 
